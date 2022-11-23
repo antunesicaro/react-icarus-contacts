@@ -14,7 +14,13 @@ export default styled.select`
     transition: border-color 0.2s ease-in;
     appearance: none;//desabilita estilos automáticos do mobile q o css pega por padrão
 
-    &:focus{ //quando elemento pai, ou seja, p  & significa aqui input,... estiver em focus, faça o estilo
+    &:focus{ //quando elemento pai, ou seja, p  & significa aqui input de select,... estiver em focus, faça o estilo
         border-color:${({theme}) => theme.colors.primary.main} ;
+    }
+
+    &[disabled]{ //quando o select(elemento pai) estiver disabled(ocorre quando o estado setisloadingcategories está true)
+        background-color: ${({theme}) => theme.colors.gray[100]};
+        border-color: ${({theme}) => theme.colors.gray[200]} ;
+        opacity: 1;
     }
 `;

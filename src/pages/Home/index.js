@@ -1,5 +1,7 @@
+//https://jakearchibald.github.io/svgomg/  ... no final, passar todas imagens em svg aqui para reduzir byte
+
 import { Link } from 'react-router-dom';
-import { Container,InputSearchContainer,Header,ListHeader,Card, ErrorContainer,EmptyListContainer } from './styles';
+import { Container,InputSearchContainer,Header,ListHeader,Card, ErrorContainer,EmptyListContainer,SearchNotFoundContainer } from './styles';
 import arrow from '../../assets/images/icons/arrow.svg';
 import edit from '../../assets/images/icons/edit.svg';
 import trash from '../../assets/images/icons/trash.svg';
@@ -7,8 +9,10 @@ import Loader from '../../components/Loader';
 import { useEffect, useState, useMemo,useCallback } from 'react';
 import ContactsService from '../../services/ContactsService';
 import sad from '../../assets/images/sad.svg';
-import empBox from '../../assets/images/empBox.svg'
+import empBox from '../../assets/images/empBox.svg';
+import question from '../../assets/images/question.svg';
 import Button from '../../components/Button';
+
 //import APIError from '../../errors/APIError';
 
 
@@ -225,6 +229,15 @@ return (
                          para cadastrar o seu primeiro</p>
                     </EmptyListContainer>
                 )}
+
+                {(contacts.length > 0 && filteredContacts.length < 1) && ( //caso para quando pesquisarmos no input e nao achar nenhum contato com esse pesquisado, portanto a api precisa ter retornado algo porém o contato filtrado tem q n existir, ou seja, ser menor do q 1 q é zero ou erro
+                    <SearchNotFoundContainer>
+                       <img src={question} alt='question lupa'></img>
+
+                       <span>Nenhum resultado encontrado para <strong>${searchTerm}</strong></span>
+                    </SearchNotFoundContainer>
+                )}
+
 
 
                 {filteredContacts.length > 0 && ( //se o tamanho for maior q zero ai sim redenriza a ordenação, se não n precisa

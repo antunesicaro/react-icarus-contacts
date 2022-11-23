@@ -7,6 +7,7 @@ import  Header  from '../Header'; //importo  o Header q vem por função exporta
 //import ContactsList from '../ContactsList';  //não irei mais precisar
 import Routes from '../../Routes'; // aqui importo as rotas
 import React from 'react';
+import ToastContainer from '../Toast/ToastContainer'; //não importa onde irei renderizar o toast, só tem q tá dentro do them provider pois vamos pegar as cores de lá e fores de routes pra estar em todas páginas
 
 function App() {
   return(
@@ -15,6 +16,7 @@ function App() {
        <React.StrictMode>
       <ThemeProvider theme={defaultTheme} >
         <GlobalStyles/>
+        <ToastContainer />
         <Container>
             <Header/>
             <Routes/>

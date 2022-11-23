@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import  ReactDOM  from "react-dom"; //para usar o nodo, portal lá do index, assim o loader n vai ter a position absoluta em relação à div pai q é container(loader está dentro de container) e sim vai ter a div pai mais externa que criamos no index
 import { Overlay } from "./styles";
+import Spinner from "../Spinner";
 
 export default function Loader({isLoading}){
 
@@ -12,7 +13,7 @@ export default function Loader({isLoading}){
 
     return ReactDOM.createPortal(
         <Overlay>
-            <div className="loader"/>
+            <Spinner size={90}/>
         </Overlay>,
         document.getElementById('loader-root'),
     );

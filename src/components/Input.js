@@ -22,4 +22,9 @@ export default styled.input`
     color: ${theme.colors.danger.main};
     border-color:${theme.colors.danger.main} !important;
     `}
+
+    &[disabled]{ //quando o select(elemento pai) estiver disabled(ocorre quando o estado setisloadingcategories está true)
+        background-color: ${({theme}) => theme.colors.gray[100]};
+        border-color: ${({theme}) => theme.colors.gray[200]} ;
+    }
 `;
