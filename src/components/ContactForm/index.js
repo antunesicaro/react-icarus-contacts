@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"; //importar pois vou precisar receber uma label via props para o form mudar de acordo com a página
-import { useState,useEffect } from "react";
+import { useState,useEffect,forwardRef,useImperativeHandle } from "react";
 
 import isEmailValid from "../../utils/isEmailValid";
 import formatPhone from "../../utils/formatPhone";
@@ -17,12 +17,17 @@ import Button from "../Button";
 import CategoriesService from "../../services/CategoriesService";
 
 
-
 //para por os erros mokados: error="O formato do email é inválido" como classe no formgroup desejado , error como class no input
+//recebe a label via props pra usar no button... vai pra pagina de new cotact para fazer a config de mandar pra cá via props
+//recebe ref como uma prop q vem lá do editcontact q é o pai.. porém ref , assim como key é propriedade interna do react, ai vai dar undefined... precisa usar o fowardRef(), que é o encaminhamento de referência. O fowardRef pega a referencia lá do editcontact contactform e encaminha pra dentro desse nosso componente, pois ai conseguimos acessar a ref
+//o retorno de fowardRef é o componente contactform
+//recebe também outro argumento q é a ref porém não como prop e sim como segundo argumento, ai sim tenho acesso ao currtent da ref, que o valor inicial é nulo q tá lá no editcontact no contactformref com useref
+//usa-se o forwardRef aqui dentro do contact form pois ele tá recebendo uma ref do editcontact, essa ref q tá vindo de lá é imperativa , ai digo q é um objeto com dados
+const ContactForm = forwardRef(({ buttonLabel,onSubmit, },ref) => { //recebe um argumento que é o render, redenrização... é um componente do react onde posso usar tudo como os hooks
 
 
-export default function ContactForm({ buttonLabel,onSubmit }){ //recebe a label via props pra usar no button... vai pra pagina de new cotact para fazer a config de mandar pra cá via props
-    //error do input é true ou false
+
+     //error do input é true ou false
 
     //para transforamr o componente em controled, basta passar um value nele com valor do name daqui do usestate... passa a ser controled.. react q fica responsabilidade do controle de informações desse componente, como ele está se copmportando, etc... react q dá o feedback visual, precisa atualizar a dom pra ver, dai tem q usar o hook setName, e usar no onchange do compopnente, no caso do input
     const [name,setName] = useState(''); //transformar o iput de nome, por exemplo, em um componente controlado, ai podemos controlar seu valor a partir do react.. o valor q tem no use state é vazio pois é o inicial.. como é um formlário, quer deixar vazio mesmo para ser preenchido.
@@ -35,8 +40,29 @@ export default function ContactForm({ buttonLabel,onSubmit }){ //recebe a label 
     const [isSubmiting,setIsSubmiting] = useState(false); //começa sendo false, pois o estado só vai ser true quando eu clicar no botao o uder enter no formuilario
 
 
+    //atribuindo  valor à ref
+    //const refObject = ref;
+    //refObject.current = 'valor setado dentro do contact form' //agora o valor q é setado aqui, ocupa o valor de null q tem no pai, que é o editcontact no useref
 
 
+    //atribuindo e setando com o hook especifico para lidar com uso imperativo... bascimanete aqui vamos dizer q o valor dessa referencia será os dados da api q estou chamando, dai vou conseguir mudar esse contact form refletindo lá no pai... perceber q temos que fazer tudo isso com o hook de uso imperativo pois a ordem do react é de pai para filho... daqui estou fazendo uma mudança do filho para o pai
+    useImperativeHandle(ref,() => ({
+         // o que for retornado da função, será o current da ref
+            setFieldsValues: (contact) => { //recebe os dados do contato diretamente do q a api retorna
+                setName(contact.name ?? '');
+                setEmail(contact.email ?? '');//uso o operador de nulish q é o ??, poderia usar o || a diferença é q o nulish só conta se for null ou undefined, já o || conta 0,nan,false,undefnid, ai sempre q fosse um desse vai ser valor vazio na string, enfim, caso de uso...se tiver valor usa ele, se n tiver usa string vazia para não dar o famoso erro de 'value' prop on... consider using an empty string
+                setPhone(contact.phone ?? '');
+                setCategoryId(contact.category_id ?? '');
+            },
+
+            resetFields: () => {
+                setName('');
+                setEmail('');
+                setPhone('');
+                setCategoryId('');
+            }
+
+    }),[]);//primeiro argumento q recebe é a ref, o segundo argumento é uma função normal q o que retorna de dentro da função será o valor q será atribuido ao current da ref... no caso quero q o valor desse retorno seja o objeto com os setname pra contact.name por exemplo
 
     const {setError,removeError,getErrorMessageByFieldName,errors} = useErrors();
 
@@ -102,6 +128,13 @@ export default function ContactForm({ buttonLabel,onSubmit }){ //recebe a label 
         //cehecar se o codigo abaixo realmejnte depende da promise, se n usar o .finally(()=>setissubmiting) na onsubmit
         setIsSubmiting(false); //quando o onsubmit for lá na handle submit, executar ela e trazer o retorno, ai vai ta finalizado o envio e boto false novamento pois n vai mais estar carregando
 
+
+
+        //quando tiver submit, limpar os campos do form: isso serve apenas para quando criar um contato, quando editar nao quero isso
+        //setName('');
+        //setEmail('');
+        //setPhone('');
+        //setCategoryId('');
         //console.log({name,email,phone,categoryId});
         //obs: se eu quisesse ao clicar, mandar pro banco somente numeros do phone, sem os () e - da mascara... exemplo: manda 40028922 ao  inves de (91) 4002-8922 ..... teria que fazer um phone.replace(/\D/g,'') ... pega todos(g de global) caracteres q nao sao digitos(D) e transforma em string vazia, assim vai ficar só os numeros
     }
@@ -180,7 +213,13 @@ export default function ContactForm({ buttonLabel,onSubmit }){ //recebe a label 
             </ButtonContainer>
         </Form>
     );
-}
+
+})
+
+
+//export default function ContactForm(){
+
+//}
 //passo a propriedade isLoading pra dentro do componente Button, pois quero ter em varios buttons o isSubmiting.. quando issubmiting é true ele bloqueia automatico o botao
 //tiro tudo isso:  {!isSubmiting && buttonLabel}
 //               {isSubmiting && <Spinner size={16}/>}
@@ -193,3 +232,5 @@ ContactForm.propTypes = {
     buttonLabel: PropTypes.string.isRequired,
     onSubmit: PropTypes.func.isRequired,
 }
+
+export default ContactForm;

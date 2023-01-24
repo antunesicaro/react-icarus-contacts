@@ -25,14 +25,18 @@ export const Container = styled.div `
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 
+    &focus{ //estilo pra quando estiver em foco para melhorar acessibilidade de quem usa leitor de tela, pois eles usam foco para ler o componente, ai quando essa div estiver no foco, vai ser tornar como se fosse botão por meio do  role do toast container
+        //também vou precisar botar um tab index como zero lá no toast message para o primeiro tab ou interaçõ com a página, focar no toast
+    }
 
     // toast seguido por outro toast
     & + & {
         margin-top: 12px;
     }
 
-    strong{
-        margin-left: 8px;
+    img{
+        margin-right: 8px;
     }
 `

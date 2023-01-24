@@ -71,6 +71,10 @@ class HttpClient{
 
 
 
+        put(path,options = {}){ //também receb os dados do body options aqui, pois precisamo enviar iinfomrções dentro do body da request pro backend.. enviamos tb o objeto com as info do contato... se nao informar o options, ele é um objeto vazio, pois posso fazer um post sem mandar body, ai vou tentar la em baixo ler propriedades de undefined, pois o options seria undefined, pra nao ocorrer isso, deixo ele pádrão como objeto
+            return this.makeRequest(path, {method: 'PUT',body:options.body,headers:options.headers,}) // manda pro make request,headers:{Authorization:'tokenexemplo'} caso queira usar token, recebo no post um token de usuario por exemplo... vem la do create do contacts service
+            }
+
 
 
 

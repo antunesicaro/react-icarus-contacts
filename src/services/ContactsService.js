@@ -10,15 +10,21 @@ class ContactsService{
 
 
 
-    async listContacts(orderBy = 'asc'){ //sempre q for chamar o método, vem como argumento o orderBy asc ou desc pra ca
+     listContacts(orderBy = 'asc'){ //sempre q for chamar o método, vem como argumento o orderBy asc ou desc pra ca
     return this.httpClient.get(`/contacts?orderBy=${orderBy}`,{headers:{Authorization:'tokentesteexemplo'}}); //passo como argumento a url, no caso nao mais a url e sim o path, pois vou centralizar e a camada q trata da requisição tá abstraida tb...acesso o this.httpclient pois é lá q tá salvo a instancia, dai quando acesso ela cede a url q tá fixada a baseurl.. desacompla pois consigo usar diferentes base url, basta fazer uma instancia... tambem mando um header de auth pra quando quiser fazer autenticação por token, por exemplo
     }
 
-    async createContact(contact){
+     createContact(contact){
         return this.httpClient.post('/contacts',{body:contact})
     }
 
+    getContactById(id){ //crio uma request para ser chamada em qualquer luigar da aplicação.. nesse caso essa aqui é chamada pela parte de edicção de contato
+        return this.httpClient.get(`/contacts/${id}`)
+    }
 
+    updateContact(id,contact){
+        return this.httpClient.put(`/contacts/${id}`, {body:contact});
+    }
 
 
 
