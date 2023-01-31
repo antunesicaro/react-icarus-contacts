@@ -4,7 +4,7 @@ import styled from "styled-components";
 export const Overlay = styled.div`
 background: rgba(0,0,0,0.6);
 backdrop-filter: blur(5px);
-position: absolute; //ficar por cima na tela
+position: fixed; //ficar por cima na tela com absolute ou fixed pra deixar fixo quando scrollar
 width: 100%;
 height: 100%;
 left: 0;
@@ -26,7 +26,7 @@ export const Container = styled.div` //Caixa em si q irá ficar no emio da tela 
     width: 100%;
 
     //tilte
-    h1{
+    > h1{ //esse maior que diz que, esse estilo só vai ser aplicado aos filhos diretos, ou seja, no h1 q estiver diretamente dentro de container
        font-size :22px;
        //a prop danger está no container, ela é true ou false... vou fazer um if aqui pra definir ela... se for true o danger vindo pro modal, ai fica vermehlo, se nao, fica normal
        color:${({theme,danger}) => (
@@ -34,9 +34,10 @@ export const Container = styled.div` //Caixa em si q irá ficar no emio da tela 
        )}
     }
 
-    p{
-        margin-top:8px;
+    .modal-body{
+        margin-top: 32px;
     }
+
 `
 
 export const Footer = styled.footer`
@@ -50,7 +51,7 @@ export const Footer = styled.footer`
         background: transparent;
         border: none;
         font-size: 16px;
-        margin-right: 8px;
+        margin-right: 24px;
         color: ${({theme}) =>theme.colors.gray[200]};
     }
 `

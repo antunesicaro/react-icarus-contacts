@@ -27,8 +27,8 @@ export const StyledButton = styled.button`
     }
 
     &[disabled]{ //quando o botão estiver com a propriedade disabled, ai faça isso
-        background: #CCC;
-        cursor: default;
+        background: #CCC !important;
+        cursor: default !important;
     }
 
     ${({theme,danger}) =>

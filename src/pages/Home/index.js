@@ -12,6 +12,8 @@ import sad from '../../assets/images/sad.svg';
 import empBox from '../../assets/images/empBox.svg';
 import question from '../../assets/images/question.svg';
 import Button from '../../components/Button';
+import Modal from '../../components/Modal';
+import toast from '../../utils/toast'
 
 //import APIError from '../../errors/APIError';
 
@@ -25,6 +27,9 @@ const [orderBy,setOrderBy] = useState('asc')//state pra salvar o toggle de orden
 const [searchTerm,setSearchTerm] = useState('');//inicia com string vazia... esse estado irá salvar o que o usuário digitar e mandar pro componente o valor de q o usuário tá digitando, q no caso é o termo de busca..searchTerm
 const [isLoading,setIsLoading] = useState(true) //estado para salvar quando a requisição tá sendo carregada ou não...começa sendo true... já começa true pois a requisição de começo tá sendo feita e recarregada
 const [hasError,setHasError] = useState(false); //começa com um estado de erro sendo false,pois só vai ser true o haserror quando for pro catch
+const [isDeleteModalVisible,setIsDeleteModalVisible] = useState(false) //estado para a modal de deleção, começa sendo false para nao mostrar ela de começo e sim apenas quando clicar no botao de delete..agora vou lá no modal mando pra ele por prop, de pai(home) para filho(modal) o estado daqui a propriedade de visible e lá no modal recebo essa prop e controlo o estado
+const [contactBeingDeleted,setContactBeingDeleted] = useState(null) //estado para aparecer o nome do contato a ser deletado na modal... enquanto ele nao clicar na lixeira, nenhum contato tá sendo deletado, entao é nulo aqui...seto no evento de click na lixeira
+const [isLoadingDelete,setIsLoadingDelete] = useState(false) //pra ver se o botao de delete tá sendo carregando enquanto faz a requisição para apagar um contato
 
 //uso o usememo sempre q eu quiser memorizar valores como numeros, trings, contatos como é esse exemplo, pois por baixo dos panos ele retorna a execução de uma função
 //usememo só executa na primeira vez que o componente for montado em tela... o array de depenncia de contato ainda é vazio da primeira vez q executa, por isso q vem de começo com 0 contatos...
@@ -163,6 +168,40 @@ function handleTryAgain(){ // o botão de tentar novamente vai fazer novamente a
    loadContacts();
 }
 
+function handleDeleteContact(contact){ //lá no onclick do icone de trash redenrizado, chama essa função aqui q vai mudar o estado...recebo os dados do contact
+    setContactBeingDeleted(contact)
+    setIsDeleteModalVisible(true); //seta pra true o estado
+}
+
+function handleCloseDeleteContact(){ //lá no onclick do modal redenrizado, chama essa função aqui q vai mudar o estado
+    setIsDeleteModalVisible(false); //seta pra false o estado
+
+}
+
+function handleCloseDeleteModal(){ //fecha modal
+    setIsDeleteModalVisible(false);
+    setContactBeingDeleted(null)//limpa o estado para nulo independente, tanto se ele confirma deleção ou fecha a modal
+}
+
+async function handleConfirmDeleteContact(){ //função que confirma a deleção do contato
+    try{
+        setIsLoadingDelete(true) //enquanto ta fazendo a requisição o botao fica disbled
+        await ContactsService.deleteContact(contactBeingDeleted.id);
+
+        toast({type:'success',text:'Contato deletado com sucesso'})
+
+        handleCloseDeleteModal();//chama função de fechar modal depois q fez a chamada pro backend e fez oq tinha q fazer
+        //pego  o prevstate para pegar o estado atual e faço um filter dentro dele
+        setContacts((prevState) => prevState.filter((contact) => contact.id !== contactBeingDeleted.id)); //atualiza o estado pois ai triga o usememo entao ele recalcula os contatos e atualiza a lista
+    }
+    catch{
+        toast({type:'danger',text:'Erro ao deletar'})
+    }
+    finally{
+        setIsLoadingDelete(false)//para de fazer loading quando a requisição é concluida
+    }
+}
+
 //console.log(orderBy);
 
 //loader: se isLoading é true, rendereiza o loader, se for false nao renderiza
@@ -171,11 +210,19 @@ function handleTryAgain(){ // o botão de tentar novamente vai fazer novamente a
 //condição para o input de digitar o nome... acesso o vetor inteiro e não o filtrado pois quero saber se de fato a api retornou algo... vehjo o tamanho, se for maior q zero ai sim redenrizo o input de busca
 //quero adicionar mais uma condição pra rendezirar o numero de contatos quando nao tiver erro e o taamanho de contacts for maior q zero... só botar mais um & pra condicionar duplamente
 //justifyContent do header manda pro style o valor de justify content dependendo do caso da regra de negócio
-
-
+//uso children ali no modal pra quando eu quiser, poder usar o modal assim: <Modal>danger tilte..props  <h2></h2> <p> enfim, depois das props passar algo q seja os filhos e eu escolha o que seja... no lugar do body paaso o children, assim o componente que for usar a modal pode passar e usar oq quiser<Modal/>
+//ali no contactbeingdeleted verifica se o valor é nulo,s e n for ai ele acessa a prop
+//mando para a modal o true ou false por meio da prop is loading pra controlar se vai ficar fazendo carregamento ou nao
 return (
         <Container>
            <Loader isLoading={isLoading}/>
+
+            <Modal isLoading={isLoadingDelete} visible={isDeleteModalVisible} onConfirm={handleConfirmDeleteContact} onCancel={handleCloseDeleteContact}
+            danger confirmLabel="Deletar" title={`Deseja remover o contato "${contactBeingDeleted?.name}" ?`}>
+
+            <p>Esta ação não poderá ser desfeita!</p>
+
+            </Modal>
 
             {contacts.length > 0 && (
                 <InputSearchContainer>
@@ -267,7 +314,7 @@ return (
 
                 <div className="actions">
                     <Link to={`/edit/${contact.id}`}><img src={edit} alt="edit"></img></Link>
-                    <button type="button"><img src={trash} alt="edit"></img></button>
+                    <button type="button" onClick={() => handleDeleteContact(contact)}><img src={trash} alt="edit"></img></button>
                 </div>
             </Card>
             ))}
@@ -278,7 +325,7 @@ return (
         </Container>
     )
 }
-
+//quando o usuario clicar ali no icone de lixeira, no onclick, vai ser chamada uma função... chamo a função e mando pra ela os dados de contact também par que eu possa lá ver o contato a ser deletado no momento... porém pra não ter loop infinito, o errode too many re-renders, passo uma arrow function e dentro da arrow executo... quando o botão for clicado ele nao vai executar o handleDeleteContat e sim uma arrow function q dentro dela tem o handledeletecontact
 
 
 

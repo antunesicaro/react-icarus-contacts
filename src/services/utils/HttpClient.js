@@ -76,8 +76,10 @@ class HttpClient{
             }
 
 
+            async delete(path,options = {}){ //também receb os dados do body options aqui, pois precisamo enviar iinfomrções dentro do body da request pro backend.. enviamos tb o objeto com as info do contato... se nao informar o options, ele é um objeto vazio, pois posso fazer um post sem mandar body, ai vou tentar la em baixo ler propriedades de undefined, pois o options seria undefined, pra nao ocorrer isso, deixo ele pádrão como objeto
 
-
+                return this.makeRequest(path, {method: 'DELETE',headers:options.headers,}) // manda pro make request,headers:{Authorization:'tokenexemplo'} caso queira usar token, recebo no post um token de usuario por exemplo... vem la do create do contacts service
+                }
 
 
     async makeRequest(path,options){ //recebe o path e também o objeto de configurações com método,headers tb vou querer receber pra caso precise autorizar autenticação, etc
@@ -122,7 +124,7 @@ class HttpClient{
           let responseBody = null
           const contentType = response.headers.get('Content-Type')
 
-          if(contentType.includes('application/json')){ //se for aplication /json faz o parse
+          if(contentType?.includes('application/json')){ //se for aplication /json faz o parse ... tem q usar o ? para nao ler nulish
             responseBody = await response.json();
             }
         if(response.status >=200 && response.status <= 299){ //retorna se tiver td ok
